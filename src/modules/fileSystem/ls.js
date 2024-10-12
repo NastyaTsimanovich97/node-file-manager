@@ -1,13 +1,10 @@
-import fs from "fs/promises";
-import { getCurrentDirectory } from "../getCurrentDirectory.js";
+import fs from "node:fs/promises";
 
 export const ls = async () => {
   const params = ["Name", "Type"];
 
-  const path = getCurrentDirectory();
+  const path = process.cwd();
   const folderFiles = (await fs.readdir(path)).sort((a, b) => a - b);
-
-  console.log("folderFiles", folderFiles);
 
   const [folders, files] = await folderFiles.reduce(async (acc, file) => {
     const prevResult = await acc;

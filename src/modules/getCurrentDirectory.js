@@ -5,5 +5,5 @@ export const getCurrentDirectory = () => {
 
   stdout.write(`\nYou are currently in ${currentDirectory}\n\n`);
 
-  return process.cwd();
+  return currentDirectory;
 };

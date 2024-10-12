@@ -1,11 +1,18 @@
-import readline from "node:readline";
+import readline from "node:readline/promises";
 
 import { getCurrentDirectory } from "./modules/getCurrentDirectory.js";
 import { endProgram } from "./modules/endProgram.js";
 import { onErrorCommand } from "./modules/onErrorCommand.js";
 import { ls } from "./modules/fileSystem/ls.js";
+import { cat, add, rn, cp, mv, rm } from "./modules/file/file.js";
 
 const usernamePrefix = "--username=";
+const operationsWithOneArgument = ["cd", "cat", "add", "rm"];
+const operationsWithTwoArguments = ["rn", "cp", "mv"];
+
+// TODO: 
+// 1. update switch
+// 2. think how cp and mv should work
 
 const main = async () => {
   // start of the program
@@ -21,38 +28,62 @@ const main = async () => {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    terminal: true,
+    terminal: false,
   });
 
   rl.on("line", async (line) => {
     const [operation, ...args] = line.split(" ");
 
-    switch (operation) {
-      case "up":
-        process.chdir("../");
-        break;
-      case "cd":
-        if (!args.length) {
-          onErrorCommand();
-          break;
-        }
-
-        try {
-          process.chdir(args[0]);
-        } catch (error) {
-          onErrorCommand({ isExecutionError: true, error });
-        }
-        break;
-      case "ls":
-        await ls();
-        break;
-
-      default:
-        onErrorCommand();
-        break;
+    if (operationsWithOneArgument.includes(operation) && !args[0]) {
+      onErrorCommand();
+      getCurrentDirectory();
+      return;
     }
 
-    getCurrentDirectory();
+    if (operationsWithTwoArguments.includes(operation) && args.length < 2) {
+      onErrorCommand();
+      getCurrentDirectory();
+      return;
+    }
+
+    try {
+      switch (operation) {
+        case "up":
+          process.chdir("../");
+          break;
+        case "cd":
+          process.chdir(args[0]);
+          break;
+        case "ls":
+          await ls();
+          break;
+        case "cat":
+          await cat(args[0]);
+          break;
+        case "add":
+          await add(args[0]);
+          break;
+        case "rn":
+          await rn(args[0], args[1]);
+          break;
+        case "cp":
+          await cp(args[0], args[1]);
+          break;
+        case "mv":
+          await mv(args[0], args[1]);
+          break;
+        case "rm":
+          await rm(args[0]);
+          break;
+        default:
+          onErrorCommand();
+          break;
+      }
+    } catch (error) {
+      onErrorCommand({ isExecutionError: true, error });
+    } finally {
+      getCurrentDirectory();
+    }
   });
 
   // end of the program
