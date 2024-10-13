@@ -5,12 +5,14 @@ import { endProgram } from "./modules/endProgram.js";
 import { onErrorCommand } from "./modules/onErrorCommand.js";
 import { ls } from "./modules/fileSystem/ls.js";
 import { cat, add, rn, cp, mv, rm } from "./modules/file/file.js";
+import { hash } from "./modules/hash/hash.js";
+import { compress, decompress } from "./modules/zlib/zlib.js";
 
 const usernamePrefix = "--username=";
-const operationsWithOneArgument = ["cd", "cat", "add", "rm"];
-const operationsWithTwoArguments = ["rn", "cp", "mv"];
+const operationsWithOneArgument = ["cd", "cat", "add", "rm", "hash"];
+const operationsWithTwoArguments = ["rn", "cp", "mv", "compress", "decompress"];
 
-// TODO: 
+// TODO:
 // 1. update switch
 // 2. think how cp and mv should work
 
@@ -74,6 +76,15 @@ const main = async () => {
           break;
         case "rm":
           await rm(args[0]);
+          break;
+        case "hash":
+          await hash(args[0]);
+          break;
+        case "compress":
+          await compress(args[0], args[1]);
+          break;
+        case "decompress":
+          await decompress(args[0], args[1]);
           break;
         default:
           onErrorCommand();
