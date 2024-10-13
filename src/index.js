@@ -3,18 +3,15 @@ import readline from "node:readline/promises";
 import { getCurrentDirectory } from "./modules/getCurrentDirectory.js";
 import { endProgram } from "./modules/endProgram.js";
 import { onErrorCommand } from "./modules/onErrorCommand.js";
-import { ls } from "./modules/fileSystem/ls.js";
-import { cat, add, rn, cp, mv, rm } from "./modules/file/file.js";
-import { hash } from "./modules/hash/hash.js";
-import { compress, decompress } from "./modules/zlib/zlib.js";
+import { ls } from "./modules/fileSystem/index.js";
+import { cat, add, rn, cp, mv, rm } from "./modules/file/index.js";
+import { hash } from "./modules/hash/index.js";
+import { compress, decompress } from "./modules/zlib/index.js";
+import { osCommand as os } from "./modules/os/index.js";
 
 const usernamePrefix = "--username=";
-const operationsWithOneArgument = ["cd", "cat", "add", "rm", "hash"];
+const operationsWithOneArgument = ["cd", "cat", "add", "rm", "hash", "os"];
 const operationsWithTwoArguments = ["rn", "cp", "mv", "compress", "decompress"];
-
-// TODO:
-// 1. update switch
-// 2. think how cp and mv should work
 
 const main = async () => {
   // start of the program
@@ -48,48 +45,28 @@ const main = async () => {
       return;
     }
 
+    const dict = {
+      up: () => process.chdir("../"),
+      cd: () => process.chdir(args[0]),
+      ls: async () => await ls(),
+      cat: async () => await cat(args[0]),
+      add: async () => await add(args[0]),
+      rn: async () => await rn(args[0], args[1]),
+      cp: async () => await cp(args[0], args[1]),
+      mv: async () => await mv(args[0], args[1]),
+      rm: async () => await rm(args[0]),
+      hash: async () => await hash(args[0]),
+      compress: async () => await compress(args[0], args[1]),
+      decompress: async () => await decompress(args[0], args[1]),
+      os: () => os(args[0]),
+      ".exit": () => {
+        endProgram(username);
+        process.exit();
+      },
+    };
+
     try {
-      switch (operation) {
-        case "up":
-          process.chdir("../");
-          break;
-        case "cd":
-          process.chdir(args[0]);
-          break;
-        case "ls":
-          await ls();
-          break;
-        case "cat":
-          await cat(args[0]);
-          break;
-        case "add":
-          await add(args[0]);
-          break;
-        case "rn":
-          await rn(args[0], args[1]);
-          break;
-        case "cp":
-          await cp(args[0], args[1]);
-          break;
-        case "mv":
-          await mv(args[0], args[1]);
-          break;
-        case "rm":
-          await rm(args[0]);
-          break;
-        case "hash":
-          await hash(args[0]);
-          break;
-        case "compress":
-          await compress(args[0], args[1]);
-          break;
-        case "decompress":
-          await decompress(args[0], args[1]);
-          break;
-        default:
-          onErrorCommand();
-          break;
-      }
+      dict[operation] ? await dict[operation]() : onErrorCommand();
     } catch (error) {
       onErrorCommand({ isExecutionError: true, error });
     } finally {

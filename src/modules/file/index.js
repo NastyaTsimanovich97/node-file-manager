@@ -56,6 +56,7 @@ export const cp = async (file, newFile) => {
     //   fs.promises.constants.COPYFILE_EXCL
     // );
   } catch (error) {
+    error.code !== "EEXIST" && (await rm(newFile));
     throw new Error(error);
   }
 };
