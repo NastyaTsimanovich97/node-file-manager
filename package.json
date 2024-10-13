@@ -1,0 +1,21 @@
+{
+  "name": "node-file-manager",
+  "version": "1.0.0",
+  "description": "File manager",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:test": "node src/index.js --username=User",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NastyaTsimanovich97/node-file-manager.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
